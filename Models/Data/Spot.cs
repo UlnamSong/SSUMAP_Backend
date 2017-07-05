@@ -15,10 +15,6 @@ namespace SSUMAP.Models.Data {
         public double Longitude { get; set; }
         public string Address { get; set; }
         public string Description { get; set; }
-        
-        [ForeignKey(nameof(Picture))]
-        public Guid PictureId { get; set; }
-        public virtual UserFile Picture { get; set; }
-        public string PictureUrl { get; set; }
+        public string PictureBinary { get; set; }
     }
 }

@@ -47,38 +47,38 @@ namespace SSUMAP.Controllers {
         [HttpPost("UploadFiles")]
         public async Task<IActionResult> CreateSpot(SpotRequestModel model) {
             Int32 value = HttpContext.Session.GetInt32(SessionId) ?? 0;
-
+            string binaryString;
             Console.WriteLine(value);
-            string webRootPath = _hostingEnvironment.WebRootPath;
-            string contentRootPath = _hostingEnvironment.ContentRootPath;
 
             if(value == 913) {
-                var spot = await CreateSpotAsync(model.Name, model.CategoryIndex, model.Latitude, model.Longitude, model.Address, model.Image, model.Description);
-                return RedirectToAction(nameof(Spots));
+                if (model.Image.Length > 0)
+                {
+                    using (var fileStream = model.Image.OpenReadStream())
+                    using (var ms = new MemoryStream())
+                    {
+                        fileStream.CopyTo(ms);
+                        var fileBytes = ms.ToArray();
+                        binaryString = Convert.ToBase64String(fileBytes);
+                    }
+                    var spot = await CreateSpotAsync(model.Name, model.CategoryIndex, model.Latitude, model.Longitude, model.Address, binaryString, model.Description);
+                    return RedirectToAction(nameof(Spots));  
+                } else {
+                    return RedirectToAction(nameof(Login));
+                }  
             } else {
                 return RedirectToAction(nameof(Login));
             }
         }
 
-        public async Task<Spot> CreateSpotAsync(string name, int categoryIndex, double latitude, double longitude, string address, IFormFile picture, string description) {
-            var filePath = _hostingEnvironment.WebRootPath + "/upload/" + name;
-
-            if (!Directory.Exists(filePath)) {
-                Directory.CreateDirectory(filePath);
-            }
-
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await picture.CopyToAsync(stream);
-            }
-
+        public async Task<Spot> CreateSpotAsync(string name, int categoryIndex, double latitude, double longitude, string address, string pictureBinary, string description) {
+            
             var spot = new Spot {
                 Name = name,
                 CategoryIndex = categoryIndex,
                 Latitude = latitude,
                 Longitude = longitude, 
                 Address = address,
-                PictureUrl = filePath,
+                PictureBinary = pictureBinary,
                 Description = description
             };
 
