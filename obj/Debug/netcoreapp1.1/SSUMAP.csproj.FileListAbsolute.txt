@@ -1,0 +1,8 @@
+/Users/terry/taein/SSUMAP/bin/Debug/netcoreapp1.1/SSUMAP.deps.json
+/Users/terry/taein/SSUMAP/bin/Debug/netcoreapp1.1/SSUMAP.runtimeconfig.json
+/Users/terry/taein/SSUMAP/bin/Debug/netcoreapp1.1/SSUMAP.runtimeconfig.dev.json
+/Users/terry/taein/SSUMAP/bin/Debug/netcoreapp1.1/SSUMAP.dll
+/Users/terry/taein/SSUMAP/bin/Debug/netcoreapp1.1/SSUMAP.pdb
+/Users/terry/taein/SSUMAP/obj/Debug/netcoreapp1.1/SSUMAP.AssemblyInfo.cs
+/Users/terry/taein/SSUMAP/obj/Debug/netcoreapp1.1/SSUMAP.dll
+/Users/terry/taein/SSUMAP/obj/Debug/netcoreapp1.1/SSUMAP.pdb
