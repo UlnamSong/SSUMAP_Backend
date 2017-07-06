@@ -15,6 +15,6 @@ namespace SSUMAP.Models.Data {
         public double Longitude { get; set; }
         public string Address { get; set; }
         public string Description { get; set; }
-        public string PictureBinary { get; set; }
+        public string FileName { get; set; }
     }
 }

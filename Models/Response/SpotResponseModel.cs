@@ -9,7 +9,7 @@ namespace SSUMAP.Models.Response
     public class SpotResponseModel
     {
         public long Id { get; }
-        public string PictureBinary { get; }
+        public string FileName { get; }
         public string Name { get; set; }
         public int CategoryIndex { get; set; }
         public double Latitude { get; set; }
@@ -21,7 +21,7 @@ namespace SSUMAP.Models.Response
         public SpotResponseModel(Spot spot)
         {
             Id = spot.Id;
-            PictureBinary = spot.PictureBinary;
+            FileName = spot.FileName;
             Name = spot.Name;
             CategoryIndex = spot.CategoryIndex;
             Latitude = spot.Latitude;

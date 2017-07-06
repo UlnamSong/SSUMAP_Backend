@@ -3,34 +3,40 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Net.Http.Headers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting;
 using SSUMAP.Models.Request;
 using SSUMAP.Models.Response;
 using SSUMAP.Models.Data;
+using SSUMAP.Models.Dul;
 using SSUMAP.Services;
 
 namespace SSUMAP.Controllers {
     public class AdminController : Controller {
         const string SessionId = "_Id";
         const string SessionPassword = "_Password";
+        private IHostingEnvironment _environment;
 
         private readonly DatabaseContext _database;
-        private readonly IHostingEnvironment _hostingEnvironment;
 
         public AdminController(DatabaseContext context, IHostingEnvironment hostenv)
         {
             this._database = context;
-            this._hostingEnvironment = hostenv;
+            this._environment = hostenv;
         }
 
         [HttpGet]
         public IActionResult Login() {
             return View();
         }
-
         public IActionResult Spots() {
+            return View();
+        }
+        [HttpGet]
+        public IActionResult Create() {
             return View();
         }
 
@@ -44,33 +50,50 @@ namespace SSUMAP.Controllers {
             }
         }
 
-        [HttpPost("UploadFiles")]
-        public async Task<IActionResult> CreateSpot(SpotRequestModel model) {
+        [HttpPost]
+        public async Task<IActionResult> CreateSpot(SpotRequestModel model, ICollection<IFormFile> files) {
             Int32 value = HttpContext.Session.GetInt32(SessionId) ?? 0;
-            string binaryString;
+            
             Console.WriteLine(value);
 
+            string fileName = string.Empty;
+            int fileSize = 0;
+            var uploadFolder = Path.Combine(_environment.WebRootPath, "files");
+
             if(value == 913) {
-                if (model.Image.Length > 0)
-                {
-                    using (var fileStream = model.Image.OpenReadStream())
-                    using (var ms = new MemoryStream())
-                    {
-                        fileStream.CopyTo(ms);
-                        var fileBytes = ms.ToArray();
-                        binaryString = Convert.ToBase64String(fileBytes);
+                foreach (var file in files) {
+                    if (file.Length > 0) {
+                        fileSize = Convert.ToInt32(file.Length);
+                        fileName = FileUtility.GetFileNameWithNumbering(uploadFolder, Path.GetFileName(
+                            ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"')));
+
+                        using(var fileStream = new FileStream(
+                            Path.Combine(uploadFolder, fileName), FileMode.Create))
+                        {
+                            await file.CopyToAsync(fileStream);
+                        }
                     }
-                    var spot = await CreateSpotAsync(model.Name, model.CategoryIndex, model.Latitude, model.Longitude, model.Address, binaryString, model.Description);
-                    return RedirectToAction(nameof(Spots));  
-                } else {
-                    return RedirectToAction(nameof(Login));
-                }  
+                }
+
+                // Spot spot = new Spot();
+
+                // spot.Name = model.Name;
+                // spot.Address = model.Address;
+                // spot.Longitude = model.Longitude;
+                // spot.Latitude = model.Latitude;
+                // spot.Description = model.Description;
+                // spot.CategoryIndex = model.CategoryIndex;
+                // spot.FileName = fileName;
+
+                // 비동기로 Spot Object 업로드하여 추가하기
+                await CreateSpotAsync(model.Name, model.CategoryIndex, model.Latitude, model.Longitude, model.Address, fileName, model.Description);                    
+                return RedirectToAction(nameof(Spots));
             } else {
                 return RedirectToAction(nameof(Login));
             }
         }
 
-        public async Task<Spot> CreateSpotAsync(string name, int categoryIndex, double latitude, double longitude, string address, string pictureBinary, string description) {
+        public async Task<Spot> CreateSpotAsync(string name, int categoryIndex, double latitude, double longitude, string address, string fileName, string description) {
             
             var spot = new Spot {
                 Name = name,
@@ -78,7 +101,7 @@ namespace SSUMAP.Controllers {
                 Latitude = latitude,
                 Longitude = longitude, 
                 Address = address,
-                PictureBinary = pictureBinary,
+                FileName = fileName,
                 Description = description
             };
 

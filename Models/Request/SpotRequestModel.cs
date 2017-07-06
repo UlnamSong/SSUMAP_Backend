@@ -8,7 +8,7 @@ namespace SSUMAP.Models.Request
 {
     public class SpotRequestModel
     {
-        public IFormFile Image { get; set; }
+        public IFormFile File { get; set; }
         public string Name { get; set; }
         public int CategoryIndex { get; set; }
         public double Latitude { get; set; }
