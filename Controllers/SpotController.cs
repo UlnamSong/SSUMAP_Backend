@@ -23,9 +23,14 @@ namespace SSUMAP.Controllers
         }
         
         [HttpGet("")]
-        public async Task<IActionResult> GetSpots(int page = 0, int take = 30) {
-            var spots = await GetSpotsAsync(page, take);
-            return Ok(spots.Select(spot => new SpotResponseModel(spot)));
+        public async Task<IActionResult> GetSpots(int categoryIndex = -1, int page = 0, int take = 30) {
+            if(categoryIndex < 0) {
+                var spots = await GetSpotsAsync(page, take);
+                return Ok(spots.Select(spot => new SpotResponseModel(spot)));
+            } else {
+                var spots = await GetSpotsAsyncCond(categoryIndex, page, take);
+                return Ok(spots.Select(spot => new SpotResponseModel(spot)));
+            }
         }
 
         [HttpGet("{id}")]
@@ -38,6 +43,8 @@ namespace SSUMAP.Controllers
             return Ok(new SpotResponseModel(spot));
         }
 
+
+
         public async Task<Spot> GetSpotAsync (int SpotId) {
             var spot = await _database.Spots.FindAsync(SpotId);
             return spot;
@@ -45,6 +52,10 @@ namespace SSUMAP.Controllers
 
         public async Task<Spot[]> GetSpotsAsync(int page = 0, int take = 30) {
             return await _database.Spots.Skip(page * take).Take(take).ToArrayAsync();
+        }
+
+        public async Task<Spot[]> GetSpotsAsyncCond(int categoryIndex, int page, int take) {
+            return await _database.Spots.FromSql("SELECT * FROM dbo.Spots WHERE CategoryIndex=" + categoryIndex).Skip(page * take).Take(take).ToArrayAsync();
         }
     }
 }
