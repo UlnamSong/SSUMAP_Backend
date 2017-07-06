@@ -44,7 +44,7 @@ namespace SSUMAP.Controllers {
         public IActionResult Login(AdminLoginRequestModel model) {
             if(model.Id == "admin" && model.Password == "85477125") {
                 HttpContext.Session.SetInt32(SessionId, 913);
-                return RedirectToAction(nameof(Spots));
+                return RedirectToAction(nameof(Create));
             } else {
                 return Content($"Auth Failed.");
             }
