@@ -2,8 +2,10 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using System.Net.Http.Headers;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
@@ -35,6 +37,7 @@ namespace SSUMAP.Controllers {
         public IActionResult Spots() {
             return View();
         }
+
         [HttpGet]
         public IActionResult Create() {
             return View();
@@ -51,7 +54,7 @@ namespace SSUMAP.Controllers {
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateSpot(SpotRequestModel model, ICollection<IFormFile> files) {
+        public async Task<IActionResult> Create(SpotRequestModel model) {
             Int32 value = HttpContext.Session.GetInt32(SessionId) ?? 0;
             
             Console.WriteLine(value);
@@ -61,32 +64,24 @@ namespace SSUMAP.Controllers {
             var uploadFolder = Path.Combine(_environment.WebRootPath, "files");
 
             if(value == 913) {
-                foreach (var file in files) {
-                    if (file.Length > 0) {
-                        fileSize = Convert.ToInt32(file.Length);
-                        fileName = FileUtility.GetFileNameWithNumbering(uploadFolder, Path.GetFileName(
-                            ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"')));
+                if (!ModelState.IsValid)
+                    return View();
 
-                        using(var fileStream = new FileStream(
-                            Path.Combine(uploadFolder, fileName), FileMode.Create))
-                        {
-                            await file.CopyToAsync(fileStream);
-                        }
+                if (model.FileName.Length > 0) {
+                    fileSize = Convert.ToInt32(model.FileName.Length);
+                    fileName = FileUtility.GetFileNameWithNumbering(uploadFolder, Path.GetFileName(
+                        ContentDispositionHeaderValue.Parse(model.FileName.ContentDisposition).FileName.Trim('"')));
+
+                    using(var fileStream = new FileStream(
+                        Path.Combine(uploadFolder, fileName), FileMode.Create))
+                    {
+                        await model.FileName.CopyToAsync(fileStream);
                     }
                 }
 
-                // Spot spot = new Spot();
-
-                // spot.Name = model.Name;
-                // spot.Address = model.Address;
-                // spot.Longitude = model.Longitude;
-                // spot.Latitude = model.Latitude;
-                // spot.Description = model.Description;
-                // spot.CategoryIndex = model.CategoryIndex;
-                // spot.FileName = fileName;
-
-                // 비동기로 Spot Object 업로드하여 추가하기
-                await CreateSpotAsync(model.Name, model.CategoryIndex, model.Latitude, model.Longitude, model.Address, fileName, model.Description);                    
+                // 비동기로 Spot Object 업로드하여 추가하기\
+                //System.Net.WebUtility.UrlEncode(model.Name);
+                await CreateSpotAsync(System.Net.WebUtility.UrlEncode(model.Name), model.CategoryIndex, model.Latitude, model.Longitude, System.Net.WebUtility.UrlEncode(model.Address), System.Net.WebUtility.UrlEncode(fileName), System.Net.WebUtility.UrlEncode(model.Description));                    
                 return RedirectToAction(nameof(Spots));
             } else {
                 return RedirectToAction(nameof(Login));

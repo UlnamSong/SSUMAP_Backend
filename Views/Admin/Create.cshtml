@@ -1,18 +1,56 @@
-﻿@model Note
-
-<h2 style="text-align:center;">게시판</h2>
-@ViewBag.TitleDescription
-<hr />
-
-<div class="row">
-    <div class="col-md-offset-2 col-md-8 col-md-offset-2">
-        <form asp-controller="DotNetNote" asp-action="Create"
-              enctype="multipart/form-data" method="post">
-            @Html.Partial("_BoardEditorForm")
-        </form>
+﻿@model SSUMAP.Models.Request.SpotRequestModel
+<div class="container">
+    <h1>장소 추가</h1>
+    <p class="text-warning">
+        새로운 장소를 추가해주세요.
+    </p>
+    <form class="form-horizontal" enctype="multipart/form-data" method="post">
+        <div class="form-group">
+            <label class="col-xs-2 control-label">장소이름</label>
+            <div class="col-xs-4">
+                @Html.TextBoxFor(m => m.Name, new {@class="form-control", placeholder="숭실대학교 정보과학관"})
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-2 control-label">주소</label>
+            <div class="col-xs-4">
+                @Html.TextBoxFor(m => m.Address, new { @class = "form-control", placeholder = "서울특별시 동작구 상도로 369" })
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-2 control-label">장소 카테고리 인덱스 (숫자)</label>
+            <div class="col-xs-4">
+                @Html.TextBoxFor(m => m.CategoryIndex, new { @class = "form-control", placeholder = "1" })
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-2 control-label">위도</label>
+            <div class="col-xs-4">
+                @Html.TextBoxFor(m => m.Latitude, new { @class = "form-control", placeholder = "37.000001" })
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-2 control-label">경도</label>
+            <div class="col-xs-4">
+                @Html.TextBoxFor(m => m.Longitude, new { @class = "form-control", placeholder = "127.000001" })
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-2 control-label">한줄설명</label>
+            <div class="col-xs-4">
+                @Html.TextBoxFor(m => m.Description, new { @class = "form-control", placeholder = "대한민국 최초의 컴퓨터공학과 건물" })
+            </div> 
+        </div>
+        <div class="form-group">
+        <label asp-for="FileName" class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+            <input type="file" name="@nameof(SSUMAP.Models.Request.SpotRequestModel.FileName)" value="" accept="image/*" style="width:290px; display:inline-block;" />
+        </div>
     </div>
+        <div class="form-group">
+            <div class="col-xs-4 col-xs-offset-2">
+                <input type="submit" class="btn btn-success" value="추가"/>
+            </div>
+        </div>
+    </form>
 </div>
-
-@section Scripts {
-    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
-}

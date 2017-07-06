@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations;
 
 namespace SSUMAP.Models.Request
 {
     public class SpotRequestModel
     {
-        public IFormFile File { get; set; }
+        public IFormFile FileName { get; set; }
         public string Name { get; set; }
         public int CategoryIndex { get; set; }
         public double Latitude { get; set; }
