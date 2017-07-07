@@ -86,14 +86,14 @@ namespace SSUMAP.Controllers {
                 }
 
                 // 비동기로 Spot Object 업로드하여 추가하기
-                await CreateSpotAsync(System.Net.WebUtility.UrlEncode(model.Name), model.CategoryIndex, model.Latitude, model.Longitude, System.Net.WebUtility.UrlEncode(model.Address), System.Net.WebUtility.UrlEncode(fileName), System.Net.WebUtility.UrlEncode(model.Description));                    
+                await CreateSpotAsync(System.Net.WebUtility.UrlEncode(model.Name), model.CategoryIndex, model.Latitude, model.Longitude, System.Net.WebUtility.UrlEncode(model.Address), System.Net.WebUtility.UrlEncode(fileName), System.Net.WebUtility.UrlEncode(model.Description), System.Net.WebUtility.UrlEncode(model.PhoneNumber));                    
                 return RedirectToAction(nameof(Create));
             } else {
                 return RedirectToAction(nameof(Index));
             }
         }
 
-        public async Task<Spot> CreateSpotAsync(string name, int categoryIndex, double latitude, double longitude, string address, string fileName, string description) {
+        public async Task<Spot> CreateSpotAsync(string name, int categoryIndex, double latitude, double longitude, string address, string fileName, string description, string phoneNumber) {
             
             var spot = new Spot {
                 Name = name,
@@ -102,7 +102,8 @@ namespace SSUMAP.Controllers {
                 Longitude = longitude, 
                 Address = address,
                 FileName = fileName,
-                Description = description
+                Description = description,
+                PhoneNumber = phoneNumber
             };
 
             _database.Spots.Add(spot);

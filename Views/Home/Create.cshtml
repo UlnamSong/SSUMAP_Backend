@@ -36,6 +36,12 @@
             </div>
         </div>
         <div class="form-group">
+            <label class="col-xs-2 control-label">전화번호</label>
+            <div class="col-xs-4">
+                @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control", placeholder = "021234567(-제외하고 입력)" })
+            </div>
+        </div>
+        <div class="form-group">
             <label class="col-xs-2 control-label">한줄설명</label>
             <div class="col-xs-4">
                 @Html.TextBoxFor(m => m.Description, new { @class = "form-control", placeholder = "대한민국 최초의 컴퓨터공학과 건물" })
