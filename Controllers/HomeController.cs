@@ -32,10 +32,18 @@ namespace SSUMAP.Controllers {
         }
 
         [HttpGet]
+        public IActionResult Login() {
+            return View();
+        }
+
         public IActionResult Index() {
             return View();
         }
         public IActionResult Spots() {
+            return View();
+        }
+
+        public IActionResult Support() {
             return View();
         }
 
@@ -50,7 +58,7 @@ namespace SSUMAP.Controllers {
         }
 
         [HttpPost]
-        public IActionResult Index(AdminLoginRequestModel model) {
+        public IActionResult Login(AdminLoginRequestModel model) {
             if(model.Id == "admin" && model.Password == "85477125") {
                 HttpContext.Session.SetInt32(SessionId, 913);
                 return RedirectToAction(nameof(Create));
