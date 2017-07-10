@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Hosting;
 using SSUMAP.Models.Request;
 using SSUMAP.Models.Response;
@@ -39,8 +40,24 @@ namespace SSUMAP.Controllers {
         public IActionResult Index() {
             return View();
         }
-        public IActionResult Spots() {
-            return View();
+
+        public async Task<IActionResult> SpotList(int page = 0, int take = 10) {
+            Int32 value = HttpContext.Session.GetInt32(SessionId) ?? 0;
+            if(value == 913) {
+                var spots = GetSpotsAsync(page, take);
+                
+                for(int i = 0; i < spots.Count(); ++i) {
+                    spots[i].Name = System.Net.WebUtility.UrlDecode(spots[i].Name);
+                }
+
+                return View(spots);
+            } else {
+                return RedirectToAction(nameof(Login));
+            }
+        }
+
+        public Spot[] GetSpotsAsync(int page = 0, int take = 30) {
+            return _database.Spots.Skip(page * take).Take(take).ToArray();
         }
 
         public IActionResult Support() {
@@ -53,7 +70,7 @@ namespace SSUMAP.Controllers {
             if(value == 913) {
                 return View();
             } else {
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Login));
             }
         }
 
@@ -61,7 +78,7 @@ namespace SSUMAP.Controllers {
         public IActionResult Login(AdminLoginRequestModel model) {
             if(model.Id == "admin" && model.Password == "85477125") {
                 HttpContext.Session.SetInt32(SessionId, 913);
-                return RedirectToAction(nameof(Create));
+                return RedirectToAction(nameof(SpotList));
             } else {
                 return Content($"Auth Failed.");
             }
@@ -81,6 +98,9 @@ namespace SSUMAP.Controllers {
                 if (!ModelState.IsValid)
                     return View();
 
+                if(model.Name == "" || model.Address == "" || model.Description == "" || model.Latitude == 0.0 || model.Longitude == 0.0 || model.CategoryIndex < 0)
+                    return View();
+
                 if (model.FileName.Length > 0) {
                     fileSize = Convert.ToInt32(model.FileName.Length);
                     fileName = FileUtility.GetFileNameWithNumbering(uploadFolder, Path.GetFileName(
@@ -95,7 +115,7 @@ namespace SSUMAP.Controllers {
 
                 // 비동기로 Spot Object 업로드하여 추가하기
                 await CreateSpotAsync(System.Net.WebUtility.UrlEncode(model.Name), model.CategoryIndex, model.Latitude, model.Longitude, System.Net.WebUtility.UrlEncode(model.Address), System.Net.WebUtility.UrlEncode(fileName), System.Net.WebUtility.UrlEncode(model.Description), System.Net.WebUtility.UrlEncode(model.PhoneNumber));                    
-                return RedirectToAction(nameof(Create));
+                return RedirectToAction(nameof(SpotList));
             } else {
                 return RedirectToAction(nameof(Index));
             }
